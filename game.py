@@ -28,9 +28,19 @@ class BlackjackGame:
 
         if self.player.calculate_score() == 21:
             self.blackjack = True
-            
+
+    def check_game_over(self):
+        game_over = False
+
+        if self.player.calculate_score() >= 21 or self.dealer.calculate_score() >= 17 or self.game_over:
+            game_over = True
+
+        return game_over
 
     def determine_winner(self):
+        if self.blackjack:
+            self.player.money += 2.5 * self.player.bet
+
         player_score = self.player.calculate_score()
         dealer_score = self.dealer.calculate_score()
 
