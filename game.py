@@ -1,3 +1,5 @@
+from traceback import print_tb
+
 from deck import Deck
 from player import Player
 from dealer import Dealer
@@ -10,7 +12,27 @@ class BlackjackGame:
         self.player = Player(STARTING_MONEY)
         self.dealer = Dealer()
         self.game_over = False
+        self.game_over_status = "Game in progress"
         self.blackjack = False
+        self.dealer_action = False
+
+    def __str__(self):
+        printed_text = "Player hand: "
+        for c in self.player.hand:
+            printed_text += f"{c} | "
+
+        printed_text += f"\nPlayer score: {self.player.calculate_score()}"
+
+
+        printed_text += "\nDealer hand: "
+        for c in self.dealer.hand:
+            printed_text += f"{c} | "
+
+        printed_text += f"\nDealer score: {self.dealer.calculate_score()}"
+        printed_text += f"\nGame over: {self.game_over}"
+        printed_text += f"\nGame over status: {self.game_over_status}"
+
+        return printed_text
 
     def start_round(self, bet):
         self.deck.create_deck()
@@ -29,50 +51,74 @@ class BlackjackGame:
         if self.player.calculate_score() == 21:
             self.blackjack = True
 
+        self.game_over = self.check_game_over()
+
     def check_game_over(self):
         game_over = False
 
-        if self.player.calculate_score() >= 21 or self.dealer.calculate_score() >= 17 or self.game_over:
+        if self.player.calculate_score() > 21 or (self.dealer.calculate_score() >= 17 and self.dealer_action) or self.game_over:
             game_over = True
 
         return game_over
 
     def determine_winner(self):
-        if self.blackjack:
-            self.player.money += 2.5 * self.player.bet
 
         player_score = self.player.calculate_score()
         dealer_score = self.dealer.calculate_score()
 
         self.game_over = True
 
-        if player_score > 21:
-            pass
+        if self.blackjack:
+            self.player.money += 2.5 * self.player.bet
+            self.game_over_status = "BLACKJACK!!!"
 
-        elif dealer_score > 21 or player_score > dealer_score:
+        elif player_score > 21:
+            self.game_over_status = "Player Bust!"
+
+        elif dealer_score > 21:
             self.player.money += 2 * self.player.bet
+            self.game_over_status = "Dealer Bust!"
+
+        elif player_score > dealer_score:
+            self.player.money += 2 * self.player.bet
+            self.game_over_status = "Player Won!"
 
         elif player_score < dealer_score:
-            pass
+            self.game_over_status = "Dealer Won!"
 
         elif player_score == dealer_score:
-            self.player.money += self.player.bet
+            self.game_over_status = "Draw!"
 
+    def dealer_turn(self):
+        self.dealer_action = True
 
+        while self.dealer.calculate_score() < 17:
+            self.dealer.add_card(self.deck.draw_card())
 
+        self.game_over = self.check_game_over()
+        self.determine_winner()
 
+    def hit(self):
+        player_hand = self.player.add_card(self.deck.draw_card())
+
+        self.game_over = self.check_game_over()
+
+        if self.game_over:
+            self.determine_winner()
+
+    def stand(self):
+        self.dealer_turn()
 
 
 bj = BlackjackGame()
-bj.start_round()
+bj.start_round(50)
+print(bj)
+print("-----------------------------")
+bj.hit()
+print(bj)
+print("-----------------------------")
+bj.stand()
+print(bj)
+print("-----------------------------")
 
-for card in bj.player.hand:
-    print(card)
 
-for card in bj.dealer.hand:
-    print(card)
-
-print()
-
-for card in bj.deck.cards:
-    print(card)
