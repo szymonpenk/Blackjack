@@ -26,5 +26,8 @@ class Player:
     def clear_hand(self):
         self.hand = []
 
+    def has_blackjack(self):
+        return len(self.hand) == 2 and self.calculate_score() == 21
+
 
 p = Player(10)

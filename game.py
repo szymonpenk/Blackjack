@@ -71,9 +71,6 @@ class BlackjackGame:
         elif bet > self.player.money:
             raise ValueError("Not enough money.")
 
-    def has_blackjack(self):
-        return len(self.player.hand) == 2 and self.player.calculate_score() == 21
-
     def determine_winner(self):
 
         player_score = self.player.calculate_score()
@@ -109,7 +106,6 @@ class BlackjackGame:
         while self.dealer.calculate_score() < 17:
             self.dealer.add_card(self.deck.draw_card())
 
-        self.game_over = self.check_game_over()
         self.determine_winner()
 
     def hit(self):
