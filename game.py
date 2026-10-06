@@ -56,7 +56,7 @@ class BlackjackGame:
             self.player.add_card(self.deck.draw_card())
             self.dealer.add_card(self.deck.draw_card())
 
-        if self.has_blackjack():
+        if self.player.has_blackjack():
             self.blackjack = True
             self.dealer_action = True
 
